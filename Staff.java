@@ -4,7 +4,7 @@ package project;
  * @author Richard
  *
  */
-public class Staff extends User{
+public class Staff extends User {
 
 	
 	public Staff () {

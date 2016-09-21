@@ -1,5 +1,5 @@
 package project;
-
+import java.sql.*;
 /**
  * @author Richard
  *
@@ -9,8 +9,6 @@ public abstract class User {
 	protected String mFirstName, mLastName, mID, mUserName, mPassword;
 	
 	protected byte mTier;
-	
-	protected int yolo;
 	
 	public String getName(String ID) {
 		return null;
@@ -28,7 +26,12 @@ public abstract class User {
 		//return rs.next();
 	}
 	
+	public void viewPurchaseHistory () {
+		String sql = "select from customerProducts where cust id = this.mID";
+	}
+	
 	public abstract void setUsername (String name);
 	
 	public abstract void setPassword (String pass);
+	
 }
