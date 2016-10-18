@@ -1,0 +1,88 @@
+/*Create tables. DO NOT TOUCH*/
+create table product (
+    name varchar(20) not null,
+    pID varchar(10) not null, 
+    description varchar (100),
+    price int not null,
+    quantityStock int,
+    constraint pk_product primary key (pID)
+);
+
+create table customer (
+    fname varchar(15) not null,
+    lname varchar(15) not null,
+    cID varchar(10) not null,
+    cPhone varchar(15) not null,
+    cZipCode varchar (5) not null,
+    cEmail varchar(30),
+    constraint pk_customer primary key (cID)
+);
+
+create table purchase (
+    custID varchar (10) not null,
+    purchaseDate date not null,
+    purchaseID varchar(10) not null,
+    constraint fk_transaction foreign key(custID) references customer (cID),
+    constraint pk_transaction primary key (purchaseID)
+);
+
+create table purchaseLine (
+    purchaseID varchar (10) not null,
+    productID varchar (10) not null,
+    quantity int not null,
+    constraint fk_purchaseline_purchase foreign key (purchaseID)
+        references purchase (purchaseID),
+    constraint fk_purchaseline_product foreign key (productID)
+        references product (pID),
+    constraint pk_purchaseLine primary key (purchaseID, productID)
+);
+
+create table pokeball (
+    name varchar(15) not null,
+    ballID varchar(10) not null,
+    ballDescription varchar (100),
+    price int not null,
+    quantityStock int,
+    catchRate int not null,
+    constraint pk_pokeballl primary key (ballID),
+    constraint pokeball_product_fk foreign key (ballID)
+    references product (pID)
+);
+
+/*Insert stuff here. You can play around with this*/
+
+insert into product (name, pID, price) values
+    ('Master Ball', '142', 1000000),
+    ('Poke Ball', '152', 10000);
+
+insert into pokeball (name, ballID, balldescription, price, catchrate) values
+    ('Master Ball', '142', 'Silph Co. highest tier poke ball', 1000000, 100),
+    ('Poke Ball', '152', 'Standard ball', 10000, 25);
+ 
+
+insert into customer (fname, lname, cID, cphone, cZipcode, cemail) values
+    ('Richard', 'DeAvila', '010668448', '562-305-2323', '00000', 'yolo@yolo.com'),
+    ('Abdul', 'asa', '010101010', '121-121-1212', '00202', 'swag@yolo.com');
+
+insert into purchase (custID, purchaseID, purchaseDate) values
+    ('010668448', '001', '2016-10-18'),
+    ('010668448', '003', '2016-10-19'),
+    ('010101010', '002', '2016-10-20'),
+    ('010668448', '004', '2016-10-21');
+
+insert into purchaseLine (productID, purchaseID, quantity) values
+    ('142', '001', 5),
+    ('152', '001', 3),
+    ('142', '002', 2),
+    ('152', '003', 1),
+    ('142', '004', 10);
+
+
+/*command space. Test commands here*/
+select *from purchase inner join purchaseLine on purchase.PURCHASEID = purchaseLine.PURCHASEID
+inner join product on purchaseLine.PRODUCTID = product.PID
+where custID = (select cID from customer where fname = 'Richard');
+
+/*   Use this to create views, which can make commands easier syntactically.
+
+create view SeePokeballs as Select *from pokeball order by name asc  ;
