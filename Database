@@ -8,6 +8,15 @@ create table product (
     constraint pk_product primary key (pID)
 );
 
+create table employee (
+    fname varchar(15) not null,
+    lname varchar(15) not null,
+    eID varchar (10) not null,
+    username varchar (15) not null,
+    password varchar (15) not null,
+    tier boolean not null    
+);
+
 create table customer (
     fname varchar(15) not null,
     lname varchar(15) not null,
@@ -77,6 +86,8 @@ insert into purchaseLine (productID, purchaseID, quantity) values
     ('152', '003', 1),
     ('142', '004', 10);
 
+insert into employee (fname, lname, eID, username, password, tier) values 
+    ('Jon', 'Onglatco', '142', 'jalex', 'jalexong', false);
 
 /*command space. Test commands here*/
 select *from purchase inner join purchaseLine on purchase.PURCHASEID = purchaseLine.PURCHASEID
