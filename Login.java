@@ -145,8 +145,12 @@ public class Login extends javax.swing.JFrame {
                             panel.add(label1);
                             panel.add(label2);
                         }
+                        else
+                            continue;
                     }
                 }
+                else
+                    continue;
             }
         }
         catch (Exception e) {
