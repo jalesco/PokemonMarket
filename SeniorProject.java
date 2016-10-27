@@ -7,6 +7,7 @@ package seniorproject;
 
 import java.sql.*;
 import java.util.Scanner;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Richard
@@ -29,15 +30,21 @@ public class SeniorProject {
    static String GET_CUSTOMERS = "Select * from products orderby pID";
    static String GET_EMPLOYEES = "Select * from employee";
    static Scanner sc = new Scanner (System.in);
-
+   static Employee usr;
    public static void main(String [] args) {
        try {
         System.out.println("Connecting to database...");
         conn = DriverManager.getConnection(DB_URL,USER,PASS);
         System.out.println("Connected succesfully");
-        while ( !(login(conn)))
-            System.out.println("Incorrect username or password. Try again");
-        System.out.println("Welcome!");
+        while ( !(login()))
+            JOptionPane.showMessageDialog(null, "Incorrect username or password");
+        JOptionPane.showMessageDialog(null, "Welcome " + usr.getFName() + " " +usr.getLName());
+        Object[] options = {"Customers", "Products", "View Customers"};
+        int n = JOptionPane.showOptionDialog(null, "What would you like to do?", "Pokemart 2,0"
+                , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[2]);
+        
+        System.out.println(n);
         stmt = conn.createStatement();
        /* String command = "create table employee (employeeID int not null)";
         stmt.executeUpdate(command);*/
@@ -61,15 +68,21 @@ public class SeniorProject {
        }
    }
    
-   private static boolean login (Connection conn) throws SQLException {
-       System.out.println("Enter a username and password");
-       String username = sc.next();
-       String password = sc.next();
+   private static boolean login () throws SQLException {
+       String username = JOptionPane.showInputDialog(null, "Enter username");
+       String password = JOptionPane.showInputDialog(null, "Enter password");
        pstmt = conn.prepareStatement("Select *from employee where username = ?"
                + " AND password = ?");
        pstmt.setString(1, username);
        pstmt.setString(2, password);
        rs = pstmt.executeQuery();
-       return rs.next();
+       if (rs.next()) {
+           usr = new Employee (rs.getString("fname"), rs.getString("lname"),
+           rs.getString("username"), rs.getString("password"), rs.getString("eID"), 
+           rs.getBoolean("tier"));
+           return true;
+       }
+       else 
+           return rs.next();
    }
 }
