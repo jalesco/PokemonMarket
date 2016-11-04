@@ -88,6 +88,32 @@ insert into purchaseLine (productID, purchaseID, quantity) values
 
 insert into employee (fname, lname, eID, username, password, tier) values 
     ('Jon', 'Onglatco', '142', 'jalex', 'jalexong', false);
+    
+create table medicine (
+    name varchar(15) not null,
+    mID varchar(10) not null,
+    mDescription varchar (100),
+    price int not null,
+    quantityStock int,
+    mType varchar(100) not null,
+    constraint pk_medicine primary key (mID),
+    constraint medicine_product_fk foreign key (mID)
+    references product (pID)
+);
+
+
+create table TM (
+    name varchar(15) not null,
+    tmID varchar(10) not null,
+    description varchar (100),
+    price int not null,
+    quantityStock int,
+    ability varchar(100) not null,
+    constraint pk_tm primary key (tmID),
+    constraint tm_product_fk foreign key (tmID)
+    references product (pID)
+);
+
 
 /*command space. Test commands here*/
 select *from purchase inner join purchaseLine on purchase.PURCHASEID = purchaseLine.PURCHASEID
