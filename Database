@@ -58,6 +58,20 @@ create table pokeball (
     references product (pID)
 );
 
+create table POTION (
+    pID varchar(10) not null,
+    potionname varchar(50) not null,
+    potiondescription varchar (100),
+    potionprice int not null,
+    potionquantity int,
+    healAmount int not null,
+    PRIMARY KEY (pID),
+    FOREIGN KEY (pID) REFERENCES product (pID)
+);
+
+
+
+
 /*Insert stuff here. You can play around with this*/
 
 insert into product (name, pID, price) values
@@ -113,6 +127,8 @@ create table TM (
     constraint tm_product_fk foreign key (tmID)
     references product (pID)
 );
+
+
 
 
 /*command space. Test commands here*/
