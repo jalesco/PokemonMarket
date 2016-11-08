@@ -39,26 +39,15 @@ public class SeniorProject {
         while ( !(login()))
             JOptionPane.showMessageDialog(null, "Incorrect username or password");
         JOptionPane.showMessageDialog(null, "Welcome " + usr.getFName() + " " +usr.getLName());
-        Object[] options = {"Customers", "Products", "View Customers"};
+        Object[] options = {"Customers", "Products", "Users"};
         int n = JOptionPane.showOptionDialog(null, "What would you like to do?", "Pokemart 2,0"
                 , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, options, options[2]);
-        
-        System.out.println(n);
-        stmt = conn.createStatement();
-       /* String command = "create table employee (employeeID int not null)";
-        stmt.executeUpdate(command);*/
-       
-        pstmt = conn.prepareStatement("select *from purchase inner join purchaseLine on purchase.PURCHASEID = purchaseLine.PURCHASEID\n" +
-"inner join product on purchaseLine.PRODUCTID = product.PID\n" +
-"where custID = (select cID from customer where fname = ?)");
-        String name = sc.next();
-        pstmt.setString(1, name);
-        rs =  pstmt.executeQuery();
-        System.out.println("Purchases for " + name);
-        while (rs.next()) {
-            System.out.println(rs.getString("Name"));
-            System.out.println(rs.getString("Quantity"));
+        switch(n) {
+            case 0:
+                customers();
+                
+                
         }
        }
        
@@ -68,7 +57,7 @@ public class SeniorProject {
        }
    }
    
-   private static boolean login () throws SQLException {
+private static boolean login () throws SQLException {
        String username = JOptionPane.showInputDialog(null, "Enter username");
        String password = JOptionPane.showInputDialog(null, "Enter password");
        pstmt = conn.prepareStatement("Select *from employee where username = ?"
@@ -85,4 +74,13 @@ public class SeniorProject {
        else 
            return rs.next();
    }
+   
+private static boolean customers() throws SQLException {
+    Object [] options = {"Add Customer", "Modify Customer", "Remove Customer"
+    , "View Customers"};
+    int n = JOptionPane.showOptionDialog(null, "What would you like to do?", "Pokemart 2,0"
+                , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[2]);    
+    return true;
+    }
 }
