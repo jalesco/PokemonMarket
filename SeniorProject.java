@@ -22,7 +22,7 @@ public class SeniorProject {
    static Connection conn = null;
    
    //Universal SQL holders
-   static Statement stmt = null;
+   static Statement stmt;
    static PreparedStatement pstmt;
    static ResultSet rs;
 
@@ -39,16 +39,11 @@ public class SeniorProject {
         while ( !(login()))
             JOptionPane.showMessageDialog(null, "Incorrect username or password");
         JOptionPane.showMessageDialog(null, "Welcome " + usr.getFName() + " " +usr.getLName());
-        Object[] options = {"Customers", "Products", "Users"};
-        int n = JOptionPane.showOptionDialog(null, "What would you like to do?", "Pokemart 2,0"
-                , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, options, options[2]);
-        switch(n) {
-            case 0:
-                customers();
-                
-                
+        boolean cont = true;
+        while(cont) {
+            select();
         }
+
        }
        
        catch (SQLException se) {
@@ -57,7 +52,9 @@ public class SeniorProject {
        }
    }
    
-private static boolean login () throws SQLException {
+   
+   
+    private static boolean login () throws SQLException {
        String username = JOptionPane.showInputDialog(null, "Enter username");
        String password = JOptionPane.showInputDialog(null, "Enter password");
        pstmt = conn.prepareStatement("Select *from employee where username = ?"
@@ -75,12 +72,52 @@ private static boolean login () throws SQLException {
            return rs.next();
    }
    
-private static boolean customers() throws SQLException {
-    Object [] options = {"Add Customer", "Modify Customer", "Remove Customer"
-    , "View Customers"};
-    int n = JOptionPane.showOptionDialog(null, "What would you like to do?", "Pokemart 2,0"
+    private static void select () throws SQLException {
+                Object[] options = {"Customers", "Products", "Users"};
+        int n = JOptionPane.showOptionDialog(null, "What would you like to do?", "Pokemart (Beta)"
                 , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, options, options[2]);    
-    return true;
+                null, options, options[2]);
+        switch(n) {
+            case 0:
+                customers();
+        }
+    }
+    
+    private static void customers() throws SQLException {
+        Object [] options = {"Add Customer", "Modify Customer", "Remove Customer"
+        , "View Customers", "Cancel"};
+        int n = JOptionPane.showOptionDialog(null, "Customers", "Pokemart (Beta)"
+                    , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[2]);    
+        switch (n) {
+            case (2):
+                String ID = JOptionPane.showInputDialog(null, "enter ID to remove");
+                pstmt = conn.prepareStatement("Select fname, lname from customer where cid = ?");
+                pstmt.setString(1, ID);
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    //this will not work at the moment. Remember for consistency
+                    //that you have to delete the dependent entities as well.
+                    JOptionPane.showMessageDialog(null, "Remove " + rs.getString("fname") + " " + rs.getString("lname"));
+                    pstmt = conn.prepareStatement("delete from customer where cid = ?");
+                    pstmt.setString(1, ID);
+                    pstmt.executeUpdate();
+                }
+                break;
+
+                
+            
+            case (3):
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery("Select fname, lname, cid from customer");
+                while (rs.next()) {
+                    System.out.println(rs.getString("fname") + " " + rs.getString("lname")
+                    + " " + rs.getString("cid"));
+                }
+                break;
+            case (4):
+                select();
+                break;
+        }
     }
 }
