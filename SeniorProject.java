@@ -4,10 +4,12 @@
  * and open the template in the editor.
  */
 package seniorproject;
-
+import java.awt.*;
 import java.sql.*;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
+import javax.swing.*;
+
 /**
  *
  * @author Richard
@@ -90,6 +92,62 @@ public class SeniorProject {
                     , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, options, options[2]);    
         switch (n) {
+              case (0)://add (updated by Patrick)
+                //Create JPanel to let user input data
+                JPanel addPanel = new JPanel(new GridLayout(6,2));
+                
+                //Create JLabel and JFormattedTextField for each attribute
+                JLabel fnameL = new JLabel("First Name:");
+                JFormattedTextField firstName = new JFormattedTextField();
+                firstName.setColumns(15);
+                JLabel lnameL = new JLabel("Last Name:");
+                JFormattedTextField lastName = new JFormattedTextField();
+                lastName.setColumns(15);
+                JLabel custIDL = new JLabel("Customer ID:");
+                JFormattedTextField custID = new JFormattedTextField();
+                custID.setColumns(10);
+                JLabel phoneL = new JLabel("Phone Number:");
+                JFormattedTextField phoneNum = new JFormattedTextField();
+                phoneNum.setColumns(15);
+                JLabel zipL = new JLabel("Zip Code:");
+                JFormattedTextField zipcode = new JFormattedTextField();
+                zipcode.setColumns(5);
+                JLabel emailL = new JLabel("Email:");
+                JFormattedTextField email = new JFormattedTextField();
+                email.setColumns(30);
+                
+                //Add the labels and text fields into panel
+                addPanel.add(fnameL);
+                addPanel.add(firstName);
+                addPanel.add(lnameL);
+                addPanel.add(lastName);
+                addPanel.add(custIDL);
+                addPanel.add(custID);
+                addPanel.add(phoneL);
+                addPanel.add(phoneNum);
+                addPanel.add(zipL);
+                addPanel.add(zipcode);
+                addPanel.add(emailL);
+                addPanel.add(email);
+                
+                //Set the panel size
+                addPanel.setPreferredSize(new Dimension(300, 150));
+                
+                //Display the add panel
+                JOptionPane.showMessageDialog(null, addPanel);
+                
+                //SQL command to add customer
+                //still need to figure out how to stop adding null info
+                pstmt = conn.prepareStatement("insert into customer values(?,?,?,?,?,?)");
+                pstmt.setString(1, firstName.getText());
+                pstmt.setString(2, lastName.getText());
+                pstmt.setString(3, custID.getText());
+                pstmt.setString(4, phoneNum.getText());
+                pstmt.setString(5, zipcode.getText());
+                pstmt.setString(6, email.getText());
+                pstmt.executeUpdate();
+                break;
+              
             case (2):
                 String ID = JOptionPane.showInputDialog(null, "enter ID to remove");
                 pstmt = conn.prepareStatement("Select fname, lname from customer where cid = ?");
