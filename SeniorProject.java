@@ -27,16 +27,33 @@ public class SeniorProject {
    static Statement stmt;
    static PreparedStatement pstmt;
    static ResultSet rs;
+   
+   //JLabels
+                   //Create JLabel and JFormattedTextField for each attribute
+static                JLabel fnameL = new JLabel("First Name:");
+static                JFormattedTextField firstName = new JFormattedTextField();
+static                JLabel lnameL = new JLabel("Last Name:");
+static                JFormattedTextField lastName = new JFormattedTextField();
+static                JLabel custIDL = new JLabel("Customer ID:");
+static                JFormattedTextField custID = new JFormattedTextField();
+static                JLabel phoneL = new JLabel("Phone Number:");
+static                JFormattedTextField phoneNum = new JFormattedTextField();
+static                JLabel zipL = new JLabel("Zip Code:");
+static                JFormattedTextField zipcode = new JFormattedTextField();
+static                JLabel emailL = new JLabel("Email:");
+static                JFormattedTextField email = new JFormattedTextField();
 
    //SQL commands
    static String GET_CUSTOMERS = "Select * from products orderby pID";
    static String GET_EMPLOYEES = "Select * from employee";
    static Scanner sc = new Scanner (System.in);
    static Employee usr;
+   final static String APPNAME = "Pokemart (Beta)";
    public static void main(String [] args) {
        try {
         System.out.println("Connecting to database...");
         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+        stmt = conn.createStatement();
         System.out.println("Connected succesfully");
         while ( !(login()))
             JOptionPane.showMessageDialog(null, "Incorrect username or password");
@@ -76,7 +93,7 @@ public class SeniorProject {
    
     private static void select () throws SQLException {
                 Object[] options = {"Customers", "Products", "Users"};
-        int n = JOptionPane.showOptionDialog(null, "What would you like to do?", "Pokemart (Beta)"
+        int n = JOptionPane.showOptionDialog(null, "What would you like to do?", APPNAME
                 , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, options, options[2]);
         switch(n) {
@@ -88,34 +105,25 @@ public class SeniorProject {
     private static void customers() throws SQLException {
         Object [] options = {"Add Customer", "Modify Customer", "Remove Customer"
         , "View Customers", "Cancel"};
-        int n = JOptionPane.showOptionDialog(null, "Customers", "Pokemart (Beta)"
+        int n = JOptionPane.showOptionDialog(null, "Customers", APPNAME
                     , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, options, options[2]);    
         switch (n) {
               case (0)://add (updated by Patrick)
                 //Create JPanel to let user input data
                 JPanel addPanel = new JPanel(new GridLayout(6,2));
-                
-                //Create JLabel and JFormattedTextField for each attribute
-                JLabel fnameL = new JLabel("First Name:");
-                JFormattedTextField firstName = new JFormattedTextField();
+
                 firstName.setColumns(15);
-                JLabel lnameL = new JLabel("Last Name:");
-                JFormattedTextField lastName = new JFormattedTextField();
+
                 lastName.setColumns(15);
-                JLabel custIDL = new JLabel("Customer ID:");
-                JFormattedTextField custID = new JFormattedTextField();
+
                 custID.setColumns(10);
-                JLabel phoneL = new JLabel("Phone Number:");
-                JFormattedTextField phoneNum = new JFormattedTextField();
+
                 phoneNum.setColumns(15);
-                JLabel zipL = new JLabel("Zip Code:");
-                JFormattedTextField zipcode = new JFormattedTextField();
+
                 zipcode.setColumns(5);
-                JLabel emailL = new JLabel("Email:");
-                JFormattedTextField email = new JFormattedTextField();
+
                 email.setColumns(30);
-                
                 //Add the labels and text fields into panel
                 addPanel.add(fnameL);
                 addPanel.add(firstName);
@@ -147,35 +155,113 @@ public class SeniorProject {
                 pstmt.setString(6, email.getText());
                 pstmt.executeUpdate();
                 break;
+                
+              case (1):
+                  String mID = JOptionPane.showInputDialog(null, "Enter the ID of customer to modify");
+                  rs = stmt.executeQuery("Select *from customer where cid = '" + mID +"'");
+                  if (rs.next()) {
+                      JPanel modPanel = new JPanel(new GridLayout(6,2));
+                
+                //Create JLabel and JFormattedTextField for each attribute
+                firstName.setText(rs.getString("fname"));
+                firstName.setColumns(15);
+
+                lastName.setText(rs.getString("lname"));
+                lastName.setColumns(15);
+
+                phoneNum.setText(rs.getString("cPhone"));
+                phoneNum.setColumns(15);
+
+                zipcode.setText(rs.getString("cZipCode"));
+                zipcode.setColumns(5);
+
+                email.setText(rs.getString("cEmail"));
+                email.setColumns(30);
+                
+                //Add the labels and text fields into panel
+                modPanel.add(fnameL);
+                modPanel.add(firstName);
+                modPanel.add(lnameL);
+                modPanel.add(lastName);
+                modPanel.add(phoneL);
+                modPanel.add(phoneNum);
+                modPanel.add(zipL);
+                modPanel.add(zipcode);
+                modPanel.add(emailL);
+                modPanel.add(email);
+                
+                //Set the panel size
+                modPanel.setPreferredSize(new Dimension(300, 150));
+                
+                //Display the add panel
+                JOptionPane.showMessageDialog(null, modPanel);
+                pstmt = conn.prepareStatement("Update customer set fname = ?, lname = ?,"
+                        + " cPhone = ?, cZipCode = ?, cEmail = ? where cID = ?");
+                pstmt.setString(1, firstName.getText());
+                pstmt.setString(2, lastName.getText());
+                pstmt.setString(3, phoneNum.getText());
+                pstmt.setString(4, zipcode.getText());
+                pstmt.setString(5, email.getText());
+                pstmt.setString(6, rs.getString("cID"));
+                pstmt.executeUpdate();
+                  }
+
+              break;
               
             case (2):
-                String ID = JOptionPane.showInputDialog(null, "enter ID to remove");
-                pstmt = conn.prepareStatement("Select fname, lname from customer where cid = ?");
-                pstmt.setString(1, ID);
-                rs = pstmt.executeQuery();
+                String rID = JOptionPane.showInputDialog(null, "enter ID to remove");
+                rs = stmt.executeQuery("Select fname, lname from customer where cid = '" + rID + "'");
+                int selection = 1;
                 if (rs.next()) {
-                    //this will not work at the moment. Remember for consistency
-                    //that you have to delete the dependent entities as well.
-                    JOptionPane.showMessageDialog(null, "Remove " + rs.getString("fname") + " " + rs.getString("lname"));
-                    pstmt = conn.prepareStatement("delete from customer where cid = ?");
-                    pstmt.setString(1, ID);
-                    pstmt.executeUpdate();
+                    selection = JOptionPane.showConfirmDialog(null, "Remove " + rs.getString("fname") + " " + rs.getString("lname"));
                 }
-                break;
-
-                
+                if (selection == 0) {
+                    Statement stmtTemp = conn.createStatement();
+                    rs = stmtTemp.executeQuery("Select purchaseID from purchase where custID = '" + rID + "'");
+                    while (rs.next()) {
+                        stmt.executeUpdate("delete from purchaseLine where purchaseID = '" + rs.getString("purchaseID") + "'");
+                    }
+                    stmt.executeUpdate("delete from purchase where custID = '" + rID + "'" );
+                    stmt.executeUpdate("delete from customer where cID = '" + rID + "'");
+                }
+                break;               
             
             case (3):
-                stmt = conn.createStatement();
-                rs = stmt.executeQuery("Select fname, lname, cid from customer");
+                rs = stmt.executeQuery("Select COUNT(*) from customer"); 
+                rs.next();
+                int count = rs.getInt(1);
+                rs = stmt.executeQuery("Select * from customer");
+                Object [] customers = new Object[count];
+                int temp = 0;
                 while (rs.next()) {
-                    System.out.println(rs.getString("fname") + " " + rs.getString("lname")
-                    + " " + rs.getString("cid"));
+                    customers[temp] = rs.getString("fname") + " " + rs.getString("lname")
+                    + " " + rs.getString("cid");
+                    ++temp;
                 }
+                String s = (String)JOptionPane.showInputDialog(
+                    null,
+                    "Select a customer",
+                    APPNAME,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    customers,
+                    "Select a customer");
+                String [] iD = s.split(" ");
+                rs = stmt.executeQuery("Select *from customer where cID = '" + iD[iD.length - 1] + "'");
+                
                 break;
             case (4):
                 select();
                 break;
         }
+    }
+    
+    public static void normalizedRemove (String ID) throws SQLException {
+        rs = stmt.executeQuery("Select purchaseID from purchase where custID = '" + ID + "'");
+        while (rs.next()) {
+            stmt.executeUpdate("delete from purchaseLine where purchaseID = '" + rs.getString("purchaseID") + "'");
+        }
+        stmt.executeUpdate("delete from purchase where custID = '" + ID + "'" );
+        stmt.executeUpdate("delete from customer where cID = '" + ID + "'");
     }
 }
