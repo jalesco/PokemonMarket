@@ -27,6 +27,7 @@ public class SeniorProject {
    static Statement stmt;
    static PreparedStatement pstmt;
    static ResultSet rs;
+   static ImageIcon icon = new ImageIcon("C:\\Users\\Richard\\Documents\\NetBeansProjects\\SeniorProject\\src\\Pokeball.png");
    
    //JLabels
                    //Create JLabel and JFormattedTextField for each attribute
@@ -97,8 +98,14 @@ static                JFormattedTextField email = new JFormattedTextField();
                 , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, options, options[2]);
         switch(n) {
+            case -1:
+                System.exit(0);
             case 0:
                 customers();
+                break;
+            case 1:
+                products();
+                break;
         }
     }
     
@@ -106,9 +113,11 @@ static                JFormattedTextField email = new JFormattedTextField();
         Object [] options = {"Add Customer", "Modify Customer", "Remove Customer"
         , "View Customers", "Cancel"};
         int n = JOptionPane.showOptionDialog(null, "Customers", APPNAME
-                    , JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[2]);    
+                    , JOptionPane.INFORMATION_MESSAGE, JOptionPane.QUESTION_MESSAGE,
+                    icon, options, options[2]);    
         switch (n) {
+            case (-1):
+                System.exit(0);
               case (0)://add (updated by Patrick)
                 //Create JPanel to let user input data
                 JPanel addPanel = new JPanel(new GridLayout(6,2));
@@ -210,20 +219,10 @@ static                JFormattedTextField email = new JFormattedTextField();
               
             case (2):
                 String rID = JOptionPane.showInputDialog(null, "enter ID to remove");
-                rs = stmt.executeQuery("Select fname, lname from customer where cid = '" + rID + "'");
-                int selection = 1;
-                if (rs.next()) {
-                    selection = JOptionPane.showConfirmDialog(null, "Remove " + rs.getString("fname") + " " + rs.getString("lname"));
-                }
-                if (selection == 0) {
-                    Statement stmtTemp = conn.createStatement();
-                    rs = stmtTemp.executeQuery("Select purchaseID from purchase where custID = '" + rID + "'");
-                    while (rs.next()) {
-                        stmt.executeUpdate("delete from purchaseLine where purchaseID = '" + rs.getString("purchaseID") + "'");
-                    }
-                    stmt.executeUpdate("delete from purchase where custID = '" + rID + "'" );
-                    stmt.executeUpdate("delete from customer where cID = '" + rID + "'");
-                }
+                if (rID == null)
+                    select();
+                else
+                    normalizedCustRemove(rID);
                 break;               
             
             case (3):
@@ -246,6 +245,8 @@ static                JFormattedTextField email = new JFormattedTextField();
                     null,
                     customers,
                     "Select a customer");
+                if (s == null) 
+                    select();
                 String [] iD = s.split(" ");
                 rs = stmt.executeQuery("Select *from customer where cID = '" + iD[iD.length - 1] + "'");
                 
@@ -256,12 +257,154 @@ static                JFormattedTextField email = new JFormattedTextField();
         }
     }
     
-    public static void normalizedRemove (String ID) throws SQLException {
-        rs = stmt.executeQuery("Select purchaseID from purchase where custID = '" + ID + "'");
-        while (rs.next()) {
-            stmt.executeUpdate("delete from purchaseLine where purchaseID = '" + rs.getString("purchaseID") + "'");
+    private static void products() throws SQLException {
+        Object [] options = {"Add", "Remove", "Modify", "View/Select", "Cancel"};
+        int n = JOptionPane.showOptionDialog(null, "Products", APPNAME, 
+                JOptionPane.INFORMATION_MESSAGE, JOptionPane.QUESTION_MESSAGE,
+                icon, options, options[0]);
+        switch (n){
+            case (-1):
+                System.exit(0);
+            case (0):
+                addProduct();
+                break;
+            case (1):
+                normalizedProductRemove();
         }
-        stmt.executeUpdate("delete from purchase where custID = '" + ID + "'" );
-        stmt.executeUpdate("delete from customer where cID = '" + ID + "'");
+    }
+    
+    private static void addProduct () throws SQLException {
+                //Create JPanel to let user input data
+                Object [] possibilities = {"Medicine", "PokeBall", "Potion",
+                    "TM"};
+                
+                String choice = (String)JOptionPane.showInputDialog(null, "What type of product?",
+                        APPNAME, 0, null, possibilities, "Product Selection");
+                if (choice == null)
+                    select();
+                String uniqueAttribute = "";
+                switch (choice) {
+                    case "Medicine":
+                        uniqueAttribute = "Stat";
+                        break;
+                    case "PokeBall":
+                        uniqueAttribute = "Catch Rate";
+                        break;
+                    case "Potion":
+                        uniqueAttribute = "Heal Amount";
+                        break;
+                    case "TM":
+                        uniqueAttribute = "Ability";
+                        break;
+                }
+                
+                JPanel addPanel = new JPanel(new GridLayout(6,2));
+                
+                JLabel nameL = new JLabel("Name:");
+                JFormattedTextField name = new JFormattedTextField();
+                JLabel pIDL = new JLabel("ID:");
+                JFormattedTextField pID = new JFormattedTextField();
+                JLabel descriptionL = new JLabel("Description:");
+                JFormattedTextField description = new JFormattedTextField();
+               JLabel priceL = new JLabel("Price:");
+               JFormattedTextField price = new JFormattedTextField();
+               JLabel quantityStockL = new JLabel("Stock:");
+               JFormattedTextField quantityStock = new JFormattedTextField();
+               JLabel uniqueAttL = new JLabel (uniqueAttribute);
+               JFormattedTextField uniqueAtt = new JFormattedTextField();
+                name.setColumns(15);
+
+                pID.setColumns(15);
+
+                description.setColumns(100);
+
+                price.setColumns(15);
+
+                quantityStock.setColumns(5);
+
+                uniqueAtt.setColumns(15);
+                //Add the labels and text fields into panel
+                addPanel.add(nameL);
+                addPanel.add(name);
+                addPanel.add(pIDL);
+                addPanel.add(pID);
+                addPanel.add(descriptionL);
+                addPanel.add(description);
+                addPanel.add(priceL);
+                addPanel.add(price);
+                addPanel.add(quantityStockL);
+                addPanel.add(quantityStock);
+                addPanel.add(uniqueAttL);
+                addPanel.add(uniqueAtt);
+                
+                //Set the panel size
+                addPanel.setPreferredSize(new Dimension(300, 150));
+                
+                //Display the add panel
+                JOptionPane.showMessageDialog(null, addPanel);
+                String pName = name.getText();
+                String productID = pID.getText();
+                String pDescription = description.getText();
+                int pPrice = Integer.parseInt(price.getText());
+                int pStock = Integer.parseInt(quantityStock.getText());
+                String pUniqueAtt = uniqueAtt.getText();
+                //SQL command to add customer
+                //still need to figure out how to stop adding null info
+                pstmt = conn.prepareStatement("insert into product values(?,?,?,?,?)");
+                pstmt.setString(1, pName);
+                pstmt.setString(2, productID);
+                pstmt.setString(3, pDescription);
+                pstmt.setInt(4, pPrice);
+                pstmt.setInt(5, pStock);
+                pstmt.executeUpdate();
+                pstmt = conn.prepareStatement("insert into " + choice + " values (?,?,?,?,?,?)");
+                //pstmt.setString(1, choice);
+                pstmt.setString(1, pName);
+                pstmt.setString(2, productID);
+                pstmt.setString(3, pDescription);
+                pstmt.setInt(4, pPrice);
+                pstmt.setInt(5, pStock);
+                if (choice.equals("PokeBall") || choice.equals("Potion"))
+                    pstmt.setInt(6, Integer.parseInt(pUniqueAtt));
+                else
+                    pstmt.setString(6, pUniqueAtt);
+                pstmt.executeUpdate();
+    }
+    
+    private static void normalizedProductRemove () throws SQLException {
+        String pID = JOptionPane.showInputDialog(null, "Enter ID to remove");
+        if (pID == null)
+            return;
+        String [] options = {"Medicine", "PokeBall", "Potion", "TM"};
+        int option = 0;
+        do {
+            rs = stmt.executeQuery("Select *from " + options[option] + " where "
+                    + "pID = '" + pID +"'");
+            option++;
+        } while (!rs.next() && option < 4);
+        String choice = options[option - 1];
+        stmt.executeUpdate("delete from " + choice + " where pID = '" + pID + "'");
+        stmt.executeUpdate("delete from purchaseLine where productID = '" + pID + "'");
+        stmt.executeUpdate("delete from product where pID = '" + pID + "'");
+    }
+    
+    private static void normalizedCustRemove (String ID) throws SQLException {
+                if (ID == null)
+                    select();
+                else
+                    rs = stmt.executeQuery("Select fname, lname from customer where cid = '" + ID + "'");
+                int selection = 1;
+                if (rs.next()) {
+                    selection = JOptionPane.showConfirmDialog(null, "Remove " + rs.getString("fname") + " " + rs.getString("lname"));
+                }
+                if (selection == 0) {
+                    Statement stmtTemp = conn.createStatement();
+                    rs = stmtTemp.executeQuery("Select purchaseID from purchase where custID = '" + ID + "'");
+                    while (rs.next()) {
+                        stmt.executeUpdate("delete from purchaseLine where purchaseID = '" + rs.getString("purchaseID") + "'");
+                    }
+                    stmt.executeUpdate("delete from purchase where custID = '" + ID + "'" );
+                    stmt.executeUpdate("delete from customer where cID = '" + ID + "'");
+                }
     }
 }
