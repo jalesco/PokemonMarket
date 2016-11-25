@@ -47,29 +47,53 @@ create table purchaseLine (
 );
 
 create table pokeball (
-    name varchar(15) not null,
-    ballID varchar(10) not null,
+    name varchar(20) not null,
+    PID varchar(10) not null,
     ballDescription varchar (100),
     price int not null,
     quantityStock int,
     catchRate int not null,
-    constraint pk_pokeballl primary key (ballID),
-    constraint pokeball_product_fk foreign key (ballID)
+    constraint pk_pokeballl primary key (pID),
+    constraint pokeball_product_fk foreign key (pID)
     references product (pID)
 );
 
 create table POTION (
+    potionname varchar(20) not null,
     pID varchar(10) not null,
-    potionname varchar(50) not null,
     potiondescription varchar (100),
     potionprice int not null,
     potionquantity int,
     healAmount int not null,
-    PRIMARY KEY (pID),
-    FOREIGN KEY (pID) REFERENCES product (pID)
+    constraint pk_potion PRIMARY KEY (pID),
+    constraint potion_product_fk FOREIGN KEY (pID)
+    REFERENCES product (pID)
+);
+
+create table medicine (
+    name varchar(20) not null,
+    PID varchar(10) not null,
+    mDescription varchar (100),
+    price int not null,
+    quantityStock int,
+    mType varchar(100) not null,
+    constraint pk_medicine primary key (PID),
+    constraint medicine_product_fk foreign key (PID)
+    references product (pID)
 );
 
 
+create table TM (
+    name varchar(20) not null,
+    PID varchar(10) not null,
+    description varchar (100),
+    price int not null,
+    quantityStock int,
+    ability varchar(100) not null,
+    constraint pk_tm primary key (PID),
+    constraint tm_product_fk foreign key (PID)
+    references product (pID)
+);
 
 
 /*Insert stuff here. You can play around with this*/
@@ -78,7 +102,7 @@ insert into product (name, pID, price) values
     ('Master Ball', '142', 1000000),
     ('Poke Ball', '152', 10000);
 
-insert into pokeball (name, ballID, balldescription, price, catchrate) values
+insert into pokeball (name, pid, balldescription, price, catchrate) values
     ('Master Ball', '142', 'Silph Co. highest tier poke ball', 1000000, 100),
     ('Poke Ball', '152', 'Standard ball', 10000, 25);
  
@@ -103,30 +127,7 @@ insert into purchaseLine (productID, purchaseID, quantity) values
 insert into employee (fname, lname, eID, username, password, tier) values 
     ('Jon', 'Onglatco', '142', 'jalex', 'jalexong', false);
     
-create table medicine (
-    name varchar(15) not null,
-    mID varchar(10) not null,
-    mDescription varchar (100),
-    price int not null,
-    quantityStock int,
-    mType varchar(100) not null,
-    constraint pk_medicine primary key (mID),
-    constraint medicine_product_fk foreign key (mID)
-    references product (pID)
-);
 
-
-create table TM (
-    name varchar(15) not null,
-    tmID varchar(10) not null,
-    description varchar (100),
-    price int not null,
-    quantityStock int,
-    ability varchar(100) not null,
-    constraint pk_tm primary key (tmID),
-    constraint tm_product_fk foreign key (tmID)
-    references product (pID)
-);
 
 
 
@@ -136,6 +137,13 @@ select *from purchase inner join purchaseLine on purchase.PURCHASEID = purchaseL
 inner join product on purchaseLine.PRODUCTID = product.PID
 where custID = (select cID from customer where fname = 'Richard');
 
+select *from customer where fname = 'Richard';
+
+select purchaseID from purchase where custID = '010668448';
+
+Select purchaseID from purchase where custID = '010668448';
+
+Select *from product;
 /*   Use this to create views, which can make commands easier syntactically.
 
-create view SeePokeballs as Select *from pokeball order by name asc  ;
+create view SeePokeballs as Select *from pokeball order by name asc ;
