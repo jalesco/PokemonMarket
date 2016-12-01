@@ -270,6 +270,12 @@ static                JFormattedTextField email = new JFormattedTextField();
                 break;
             case (1):
                 normalizedProductRemove();
+            case (3):
+                productView();
+                break;
+           case (4):
+                select();
+                break;
         }
     }
     
@@ -387,6 +393,23 @@ static                JFormattedTextField email = new JFormattedTextField();
         stmt.executeUpdate("delete from purchaseLine where productID = '" + pID + "'");
         stmt.executeUpdate("delete from product where pID = '" + pID + "'");
     }
+   
+   private static void productView() throws SQLException {
+        rs = stmt.executeQuery("select count(*) from product");
+        rs.next();
+        int count = rs.getInt(1);
+        rs = stmt.executeQuery("select * from product");
+        Object[] products = new Object[count];
+        int temp = 0;
+        while(rs.next()) {
+            products[temp] = rs.getString("name") + " " + rs.getString("pid");
+            ++temp;
+        }
+        String s = (String) JOptionPane.showInputDialog(null, "Select a product", APPNAME,
+                JOptionPane.PLAIN_MESSAGE, null, products, "Select a product");
+        String[] prodID = s.split(" ");
+        rs = stmt.executeQuery("Select * from product where pid = '" + prodID[prodID.length - 1] + "'");
+    }        
     
     private static void normalizedCustRemove (String ID) throws SQLException {
                 if (ID == null)
