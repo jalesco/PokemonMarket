@@ -126,6 +126,9 @@ insert into purchaseLine (productID, purchaseID, quantity) values
 
 insert into employee (fname, lname, eID, username, password, tier) values 
     ('Jon', 'Onglatco', '142', 'jalex', 'jalexong', false);
+
+insert into employee (fname, lname, eID, username, password, tier) values
+    ('Patrick', 'Izawa', '001', 'ptrick', 'pikachu', true);
     
 
 
