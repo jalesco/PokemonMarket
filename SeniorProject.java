@@ -23,7 +23,7 @@ public class SeniorProject {
     static Statement stmt;
     static PreparedStatement pstmt;
     static ResultSet rs;
-    static ImageIcon icon = new ImageIcon("C:\\Users\\Richard\\Documents\\NetBeansProjects\\SeniorProject\\src\\Pokeball.png");
+    static ImageIcon icon = new ImageIcon("C:\\Users\\Richard\\My Documents\\NetBeansProjects\\SeniorProject\\src\\pokeball.png");
     // JLabels
     // Create JLabel and JFormattedTextField for each attribute
     static JLabel fnameL = new JLabel("First Name:");
@@ -86,7 +86,7 @@ public class SeniorProject {
 	Object[] options = { "Customers", "Products", "Users" };
         int n = JOptionPane.showOptionDialog(null, "What would you like to do?", APPNAME,
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, options, options[2]);
+                icon, options, options[2]);
 	switch (n) {
             case (-1):
                 System.exit(0);
@@ -96,6 +96,15 @@ public class SeniorProject {
             case (1):
                 products();
                 break;
+            case (2):
+                if (usr.getTier())
+                    users();
+                else {
+                    JOptionPane.showMessageDialog(null, "You do not have permission"
+                            + " to access [users]! ", "Slow down there, kiddo!",
+                            JOptionPane.WARNING_MESSAGE, icon);
+                }
+                break;
 	}
     }
 
@@ -104,7 +113,7 @@ public class SeniorProject {
             "View Customers", "Cancel" };
 	int n = JOptionPane.showOptionDialog(null, "Customers", APPNAME,
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, options, options[2]);
+                icon, options, options[2]);
         switch (n) {
             case (0):// add 
                 addCustomer();
@@ -136,6 +145,8 @@ public class SeniorProject {
 		}
 		String s = (String) JOptionPane.showInputDialog(null, "Select a customer", APPNAME, 
                         JOptionPane.PLAIN_MESSAGE, null, customers, "Select a customer");
+                if (s == null || s.length() < 1) 
+                    return;
 		String[] iD = s.split(" ");
                 rs = stmt.executeQuery("Select *from customer where cID = '" + iD[iD.length - 1] + "'");
                 break;
@@ -277,7 +288,7 @@ public class SeniorProject {
         //Create JPanel to let user input data
         Object [] possibilities = {"Medicine", "PokeBall", "Potion", "TM"};
         String choice = (String)JOptionPane.showInputDialog(null, 
-                "What type of product?", APPNAME, 0, null, possibilities, 
+                "What type of product?", APPNAME, 1, null, possibilities, 
                 "Product Selection");
         if (choice == null)
             select();
@@ -399,6 +410,8 @@ public class SeniorProject {
         }
         String s = (String) JOptionPane.showInputDialog(null, "Select a product", APPNAME,
                 JOptionPane.PLAIN_MESSAGE, null, products, "Select a product");
+        if (s == null)
+            return;
         String[] prodID = s.split(" ");
         rs = stmt.executeQuery("Select * from product where pid = '" + prodID[prodID.length - 1] + "'");
     }        
