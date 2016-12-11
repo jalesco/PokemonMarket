@@ -26,6 +26,7 @@ public class SeniorProject {
     static ImageIcon icon = new ImageIcon("C:\\Users\\Richard\\My Documents\\NetBeansProjects\\SeniorProject\\src\\pokeball.png");
     // JLabels
     // Create JLabel and JFormattedTextField for each attribute
+    /*NOTE: Remove these in the future! Un-optimal!*/
     static JLabel fnameL = new JLabel("First Name:");
     static JFormattedTextField firstName = new JFormattedTextField();
     static JLabel lnameL = new JLabel("Last Name:");
@@ -55,7 +56,7 @@ public class SeniorProject {
             while (!(login())) {
                 JOptionPane.showMessageDialog(null,"Incorrect username or password");
             }
-            JOptionPane.showMessageDialog(null, "Welcome " + usr.getFName() + " " + usr.getLName());
+            JOptionPane.showMessageDialog(null, "Welcome " + usr.getFirstName()+ " " + usr.getLastName());
             boolean cont = true;
             while (cont) {
                 select();
@@ -63,7 +64,6 @@ public class SeniorProject {
 	}
 	catch (SQLException se) {
             se.printStackTrace();
-            // goto main
         }
     }
 
@@ -132,6 +132,15 @@ public class SeniorProject {
 		break;
             
             case (3): //view
+                CustomerView();
+                break;
+            
+            case (4):
+                break;
+        }
+    }
+
+    private static void CustomerView () throws SQLException {
                 rs = stmt.executeQuery("Select COUNT(*) from customer");
 		rs.next();
 		int count = rs.getInt(1);
@@ -149,14 +158,13 @@ public class SeniorProject {
                     return;
 		String[] iD = s.split(" ");
                 rs = stmt.executeQuery("Select *from customer where cID = '" + iD[iD.length - 1] + "'");
-                break;
-            
-            case (4):
-                select();
-                break;
-        }
+                if (rs.next()) {
+                    Customer cust = new Customer(rs.getString("fname"), rs.getString("lname"), 
+                        rs.getString("cID"), rs.getString("cPhone"), rs.getString("cZipCode"),
+                        rs.getString("cEmail"));
+                    CustomerOperations(cust);
+                }
     }
-
     private static void products() throws SQLException {
         Object [] options = {"Add", "Remove", "Modify", "View/Select", "Cancel"};
         int n = JOptionPane.showOptionDialog(null, "Products", APPNAME, 
@@ -164,7 +172,7 @@ public class SeniorProject {
                 icon, options, options[0]);
         switch (n){
             case (-1):
-                System.exit(0);
+                return;
             case (0):
                 addProduct();
                 break;
@@ -177,11 +185,15 @@ public class SeniorProject {
                 productView();
                 break;
             case (4):
-                select();
                 break;
         }
     }
     
+    /**
+     * 
+     * NOTE: Methods needs further development
+     * @throws SQLException 
+     */
     public static void users() throws SQLException {
         Object[] options = {"Add", "Remove", "Modify", "Cancel"};
         int n = JOptionPane.showOptionDialog(null, "Employee", APPNAME, 
@@ -190,12 +202,71 @@ public class SeniorProject {
         switch(n) {
             case (-1):
                 break;
-            case (3):
-                select();
+            case (0):
+                //addUser();
                 break;
         }
     }
-    
+    /*
+    public static void addUser() throws SQLException {
+        JLabel fnameL = new JLabel("First Name:");
+        JFormattedTextField fname = new JFormattedTextField();
+        JLabel lnameL = new JLabel("Last Name:");
+        JFormattedTextField lname = new JFormattedTextField();
+        JLabel uIDL = new JLabel("ID:");
+        JFormattedTextField uID = new JFormattedTextField();
+        JLabel userL = new JLabel("Username:");
+        JFormattedTextField user = new JFormattedTextField();
+        JLabel passL = new JLabel("Password:");
+        JFormattedTextField pass = new JFormattedTextField();
+        JLabel tierL = new JLabel("Stock:");
+        JFormattedTextField quantityStock = new JFormattedTextField();
+        JLabel uniqueAttL = new JLabel (uniqueAttribute);
+        JFormattedTextField uniqueAtt = new JFormattedTextField();
+                
+        name.setColumns(15);
+        pID.setColumns(15);
+        description.setColumns(100);
+        price.setColumns(15);
+        quantityStock.setColumns(5);
+        uniqueAtt.setColumns(15);
+        
+        //Add the labels and text fields into panel
+        addPanel.add(nameL);
+        addPanel.add(name);
+        addPanel.add(pIDL);
+        addPanel.add(pID);
+        addPanel.add(descriptionL);
+        addPanel.add(description);
+        addPanel.add(priceL);
+        addPanel.add(price);
+        addPanel.add(quantityStockL);
+        addPanel.add(quantityStock);
+        addPanel.add(uniqueAttL);
+        addPanel.add(uniqueAtt);
+                
+        //Set the panel size
+        addPanel.setPreferredSize(new Dimension(300, 150));
+                
+        //Display the add panel
+        JOptionPane.showMessageDialog(null, addPanel);
+        String pName = name.getText();
+        String productID = pID.getText();
+        String pDescription = description.getText();
+        int pPrice = Integer.parseInt(price.getText());
+        int pStock = Integer.parseInt(quantityStock.getText());
+        String pUniqueAtt = uniqueAtt.getText();
+
+        pstmt = conn.prepareStatement("insert into product values(?,?,?,?,?)");
+        pstmt.setString(1, pName);
+        pstmt.setString(2, productID);
+        pstmt.setString(3, pDescription);
+        pstmt.setInt(4, pPrice);
+        pstmt.setInt(5, pStock);
+        pstmt.executeUpdate();
+        pstmt = conn.prepareStatement("insert into " + choice + " values (?,?,?,?,?,?)");        
+    }
+*/
     private static void addCustomer() throws SQLException {
         JPanel addPanel = new JPanel(new GridLayout(6,2));
         firstName.setColumns(15);
@@ -291,7 +362,7 @@ public class SeniorProject {
                 "What type of product?", APPNAME, 1, null, possibilities, 
                 "Product Selection");
         if (choice == null)
-            select();
+            return;
         String uniqueAttribute = "";
         switch (choice) {
             case "Medicine":
@@ -305,6 +376,8 @@ public class SeniorProject {
                 break;
             case "TM":
                 uniqueAttribute = "Ability";
+                break;
+            default:
                 break;
         }
                 
@@ -355,9 +428,7 @@ public class SeniorProject {
         int pPrice = Integer.parseInt(price.getText());
         int pStock = Integer.parseInt(quantityStock.getText());
         String pUniqueAtt = uniqueAtt.getText();
-                
-        //SQL command to add customer   
-        //still need to figure out how to stop adding null info
+
         pstmt = conn.prepareStatement("insert into product values(?,?,?,?,?)");
         pstmt.setString(1, pName);
         pstmt.setString(2, productID);
@@ -367,7 +438,7 @@ public class SeniorProject {
         pstmt.executeUpdate();
         pstmt = conn.prepareStatement("insert into " + choice + " values (?,?,?,?,?,?)");
                 
-        //pstmt.setString(1, choice);
+
         pstmt.setString(1, pName);
         pstmt.setString(2, productID);
         pstmt.setString(3, pDescription);
@@ -419,7 +490,7 @@ public class SeniorProject {
     
     private static void normalizedCustRemove (String ID) throws SQLException {
         if (ID == null)
-            select();
+            return;
         else
             rs = stmt.executeQuery("Select fname, lname from customer where cid = '" + ID + "'");
         int selection = 1;
@@ -438,5 +509,18 @@ public class SeniorProject {
             stmt.executeUpdate("delete from purchase where custID = '" + ID + "'" );
             stmt.executeUpdate("delete from customer where cID = '" + ID + "'");
         }
+    }
+
+    /**
+     * 
+     * NOTE: Method needs further development.
+     * @param cust 
+     */
+    private static void CustomerOperations(Customer cust) {
+        Object [] options = {"Modify", "Remove", "View Purchases", "Cancel"};
+        JOptionPane.showOptionDialog(null, cust.infoRetrieve(), APPNAME,
+            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+            options, 1 );
+        
     }
 }
